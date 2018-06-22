@@ -1,0 +1,105 @@
+---
+version: '2.1'
+
+services:
+  db1_master:
+    hostname: db1_master
+    build: https://github.com/flopex/docker-mysql-replication.git#:5.7
+    healthcheck:
+      test: "mysqladmin ping -ppassword"
+    environment: &db_default_env
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+      MYSQL_DATABASE: test_db
+      REPLICATION_USER: repl_user
+      REPLICATION_PASSWORD: repl_password
+    networks:
+      main:
+        aliases:
+          - master
+          - db1_master
+
+  db2_replica:
+    hostname: db2_replica
+    build: https://github.com/flopex/docker-mysql-replication.git#:5.7
+    environment: &db_replica_env
+      <<: *db_default_env
+      MASTER_HOST: db1_master
+      MASTER_PORT: 3306
+      SERVER_ID: 2
+    depends_on: &db_replica_depends_on
+      db1_master:
+        condition: service_healthy
+    networks:
+      main:
+        aliases:
+          - db2_replica
+
+  db3_replica:
+    hostname: db3_replica
+    build:
+      context: https://github.com/flopex/docker-mysql-replication.git#:5.7
+    environment:
+      <<: *db_replica_env
+      SERVER_ID: 3
+    depends_on: *db_replica_depends_on
+    networks:
+      main:
+        aliases:
+          - db3_replica
+
+  db4_replica:
+    hostname: db4_replica
+    build:
+      context: https://github.com/flopex/docker-mysql-replication.git#:5.7
+    environment:
+      <<: *db_replica_env
+      SERVER_ID: 4
+    depends_on: *db_replica_depends_on
+    networks:
+      main:
+        aliases:
+          - db4_replica
+
+  orchestrator1:
+    hostname: orchestrator1
+    build: .
+    volumes: &orc_vols
+      - ./docker/entrypoint.sh:/entrypoint.sh:ro
+    ports:
+      - 3331:3000
+    environment: &orc_env
+      ORC_TOPOLOGY_USER: root
+      ORC_TOPOLOGY_PASSWORD: password
+    networks:
+      main:
+        aliases:
+          - orchestrator1
+
+  orchestrator2:
+    hostname: orchestrator2
+    build: .
+    volumes: *orc_vols
+    ports:
+      - 3332:3000
+    environment: *orc_env
+    networks:
+      main:
+        aliases:
+          - orchestrator2
+
+  orchestrator3:
+    hostname: orchestrator3
+    build: .
+    volumes: *orc_vols
+    ports:
+      - 3333:3000
+    environment: *orc_env
+    networks:
+      main:
+        aliases:
+          - orchestrator3
+
+networks:
+  main:
