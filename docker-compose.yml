@@ -101,5 +101,20 @@ services:
         aliases:
           - orchestrator3
 
+  haproxy:
+    image: haproxy:1.8
+    depends_on:
+      - orchestrator1
+      - orchestrator2
+      - orchestrator3
+    ports:
+      - 8080:80
+    volumes:
+      - ./docker/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks:
+      main:
+        aliases:
+          - haproxy
+
 networks:
   main:
