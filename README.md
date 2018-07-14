@@ -1,4 +1,4 @@
-# Docker
+# Orchestrator on Raft
 
 ## Building and running full testing cluster
 ```
@@ -14,13 +14,15 @@ db1_master:3306    [0s,ok,5.7.22-log,rw,ROW,P-GTID]
 + db4_replica:3306 [0s,ok,5.7.22-log,rw,ROW,>>,P-GTID]
 ```
 
+![Orchestrator on Raft screenshot](assets/orchestrator_raft_screenshot.png)
+
 ## Building and running only one instance of orchestrator
 ```
 docker-compose up orchestrator1
 ```
 
-Once orchestrator is running it can be accessed through any of the following URLs:
+Once orchestrator and haproxy is running it can be accessed through the following URL.
 
-* http://127.0.0.1:3331/
-* http://127.0.0.1:3332/
-* http://127.0.0.1:3333/
+* http://127.0.0.1:8080
+
+This will only proxy to the current Raft leader
