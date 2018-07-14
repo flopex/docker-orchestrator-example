@@ -2,8 +2,8 @@
 version: '2.1'
 
 services:
-  db1_master:
-    hostname: db1_master
+  db1:
+    hostname: db1
     build: https://github.com/flopex/docker-mysql-replication.git#:5.7
     healthcheck:
       test: "mysqladmin ping -ppassword"
@@ -18,26 +18,26 @@ services:
       main:
         aliases:
           - master
-          - db1_master
+          - db1
 
-  db2_replica:
-    hostname: db2_replica
+  db2:
+    hostname: db2
     build: https://github.com/flopex/docker-mysql-replication.git#:5.7
     environment: &db_replica_env
       <<: *db_default_env
-      MASTER_HOST: db1_master
+      MASTER_HOST: db1
       MASTER_PORT: 3306
       SERVER_ID: 2
     depends_on: &db_replica_depends_on
-      db1_master:
+      db1:
         condition: service_healthy
     networks:
       main:
         aliases:
-          - db2_replica
+          - db2
 
-  db3_replica:
-    hostname: db3_replica
+  db3:
+    hostname: db3
     build:
       context: https://github.com/flopex/docker-mysql-replication.git#:5.7
     environment:
@@ -47,10 +47,10 @@ services:
     networks:
       main:
         aliases:
-          - db3_replica
+          - db3
 
-  db4_replica:
-    hostname: db4_replica
+  db4:
+    hostname: db4
     build:
       context: https://github.com/flopex/docker-mysql-replication.git#:5.7
     environment:
@@ -60,7 +60,7 @@ services:
     networks:
       main:
         aliases:
-          - db4_replica
+          - db4
 
   orchestrator1:
     hostname: orchestrator1
