@@ -18,9 +18,20 @@ cat <<EOF > /etc/orchestrator.conf.json
     "orchestrator2",
     "orchestrator3"
   ],
-  "AutoPseudoGTID": true
+  "RecoveryPeriodBlockSeconds": 30,
+  "RecoveryIgnoreHostnameFilters": [],
+  "RecoverMasterClusterFilters": [
+    "*"
+  ],
+  "RecoverIntermediateMasterClusterFilters": [
+    "*"
+  ],
+  "ApplyMySQLPromotionAfterMasterFailover": true,
+  "AutoPseudoGTID": true,
+  "KVClusterMasterPrefix": "mysql/master",
+  "ZkAddress": "zoo1,zoo2,zoo3"
 }
 EOF
 fi
 
-exec /usr/local/orchestrator/orchestrator http
+exec /usr/local/orchestrator/orchestrator -debug http
